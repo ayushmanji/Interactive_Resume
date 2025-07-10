@@ -38,3 +38,17 @@
 ### Clone the repo
 ```bash
 git clone https://github.com/ayushmanji/interactive-resume.git
+cd interactive-resume
+```
+
+Open index.html in your browser
+No additional setup required!
+
+## 🤝 Contact
+
+### 📧 Email: sharmaayushmansharma@gmail.com
+### 🔗 LinkedIn: linkedin.com/in/ayushman-sharma-19b9392a8
+### 💻 GitHub: github.com/ayushmanji
+
+## 📜 License
+This project is licensed under the MIT License
