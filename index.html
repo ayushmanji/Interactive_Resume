@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayushman Sharma - Interactive Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind dark mode
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #e5e7eb;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: #3b82f6;
+            transition: width 1s ease-out;
+        }
+
+        .dark .progress-bar {
+            background: #374151;
+        }
+
+        .project-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .nav-link {
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .skill-icon {
+            transition: all 0.3s ease;
+        }
+
+        .skill-icon:hover {
+            transform: scale(1.1);
+            color: #3b82f6;
+        }
+
+        #mobile-menu {
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+        }
+
+        #mobile-menu.open {
+            transform: translateX(0);
+        }
+
+        .theme-toggle {
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(30deg);
+        }
+
+        /*  */
+
+        .glow-on-hover {
+            width: 220px;
+            height: 50px;
+            border: none;
+            outline: none;
+            color: #fff;
+            background: #111;
+            cursor: pointer;
+            position: relative;
+            z-index: 0;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .glow-on-hover:before {
+            content: '';
+            background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            background-size: 400%;
+            z-index: -1;
+            filter: blur(5px);
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            animation: glowing 20s linear infinite;
+            opacity: 0;
+            transition: opacity .3s ease-in-out;
+            border-radius: 10px;
+        }
+
+        .glow-on-hover:hover:before {
+            opacity: 1;
+        }
+
+        .glow-on-hover:after {
+            z-index: -1;
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            border-radius: 10px;
+        }
+
+        .glow-on-hover:active {
+            color: #000;
+        }
+
+        .glow-on-hover:active:after {
+            background: transparent;
+        }
+
+        @keyframes glowing {
+            0% {
+                background-position: 0 0;
+            }
+
+            50% {
+                background-position: 400% 0;
+            }
+
+            100% {
+                background-position: 0 0;
+            }
+        }
+
+        .button {
+            position: relative;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .button a {
+            position: relative;
+            display: block;
+            text-align: center;
+            padding: 14px 32px;
+            font-weight: 600;
+            font-family: Helvetica, sans-serif;
+            font-size: 18px;
+            border-radius: 6px;
+            text-decoration: none;
+            text-shadow: 0 1px 0 #000;
+            transition: all 0.15s ease-in-out;
+
+            /* Box shadows for 3D effect */
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 8px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .button a:active {
+            top: 8px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), inset 0 -3px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .button:after {
+            content: "";
+            height: 100%;
+            width: 100%;
+            padding: 4px;
+            position: absolute;
+            bottom: -12px;
+            left: -4px;
+            z-index: -1;
+            background-color: rgba(0, 0, 0, 0.25);
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body class="bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-100">
+    <!-- Header -->
+    <header class="fixed w-full bg-white dark:bg-gray-900 shadow-md z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400">John Doe</h1> -->
+            <h1 class="text-2xl font-bold">
+                <img src="dark.png" alt="Ayushman Logo" class="h-16 block dark:hidden" id="logo-light" />
+                <img src="light.png" alt="Ayushman Logo Dark" class="h-16 hidden dark:block" id="logo-dark" />
+            </h1>
+
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex space-x-6">
+                <a href="#about"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">About</a>
+                <a href="#education"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Education</a>
+                <a href="#experience"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Experience</a>
+                <a href="#skills"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Skills</a>
+                <a href="#projects"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Projects</a>
+                <a href="#contact"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Contact</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <!-- Theme Toggle -->
+                <button id="theme-toggle"
+                    class="theme-toggle p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none">
+                    <i class="fas fa-moon text-gray-600 dark:hidden"></i>
+                    <i class="fas fa-sun text-yellow-300 hidden dark:block"></i>
+                </button>
+
+                <!-- Download Resume Button -->
+                <a href="Ayushman Sharma.pdf" download
+                    class="hidden md:block bg-blue-600 hover:bg-blue-700 glow-on-hover text-white font-medium px-4 py-2 rounded-md transition-colors">
+                    <i class="fas fa-download mr-2"></i>Download CV
+                </a>
+
+
+                <!-- Mobile Menu Button -->
+                <button id="menu-toggle"
+                    class="md:hidden p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu"
+            class="md:hidden fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-800 shadow-lg z-50 pt-20 px-4">
+            <button id="close-menu"
+                class="absolute top-4 right-4 p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+            <nav class="flex flex-col space-y-4">
+                <a href="#about"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">About</a>
+                <a href="#education"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Education</a>
+                <a href="#experience"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Experience</a>
+                <a href="#skills"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Skills</a>
+                <a href="#projects"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Projects</a>
+                <a href="#contact"
+                    class="nav-link font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Contact</a>
+                <a href="Ayushman Sharma.pdf" download
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-center transition-colors">
+                    <i class="fas fa-download mr-2"></i>Download CV
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="hero" class="pt-28 pb-20 bg-gradient-to-br from-blue-50 to-white dark:from-gray-900 dark:to-gray-800">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0 animate-fadeIn">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    Hi, I'm <span class="text-blue-600 dark:text-blue-400">Ayushman Sharma</span>
+                </h1>
+                <h2 class="text-2xl md:text-3xl font-semibold mb-6 text-gray-700 dark:text-gray-300">
+                    B.Tech CSE Student @ SPSU University
+                </h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">
+                    Web development enthusiast passionate about building interactive, responsive, and AI-powered web
+                    applications. Currently working on an AI-based Resume Builder and an educational platform called
+                    BrainSpark.
+                </p>
+                <div class="flex space-x-4">
+                    <!-- 3D Get in Touch Button -->
+                    <div class="button">
+                        <a href="#contact"
+                            class="bg-blue-600 text-white font-medium px-6 py-3 rounded-md text-lg transition-colors">
+                            Get in Touch
+                        </a>
+                    </div>
+
+                    <!-- 3D View Projects Button -->
+                    <div class="button">
+                        <a href="#projects"
+                            class="bg-white text-blue-600 border-2 border-blue-600 dark:text-blue-400 dark:border-blue-400 px-6 py-3 rounded-md font-medium text-lg transition-colors">
+                            View Projects
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="md:w-1/2 flex justify-center animate-fadeIn" style="animation-delay: 0.3s;">
+                <div
+                    class="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-lg border-4 border-blue-600 dark:border-blue-400">
+                    <img src="photo2.jpg" alt="Ayushman Sharma" class="w-full h-full object-cover" />
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white dark:bg-gray-900 section scroll-mt-10">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center">About <span
+                    class="text-blue-600 dark:text-blue-400">Me</span></h2>
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <div
+                        class="bg-blue-50 dark:bg-gray-800 p-6 rounded-lg border-l-4 border-blue-600 dark:border-blue-400 shadow-md">
+                        <p class="text-lg mb-4">
+                            I'm Ayushman Sharma, a B.Tech CSE student at SPSU University, Udaipur with a passion for
+                            frontend web development and emerging tech.
+                        </p>
+                        <p class="text-lg mb-4">
+                            I enjoy building engaging, responsive, and interactive web applications. My learning journey
+                            includes practical experience with HTML, CSS, JavaScript, Tailwind CSS, and MongoDB.
+                        </p>
+                        <p class="text-lg">
+                            Currently, I'm working on projects like an AI-powered Resume Builder and BrainSpark—an
+                            educational quiz platform—demonstrating both creativity and technical depth.
+                        </p>
+                    </div>
+                </div>
+                <div class="md:w-1/2 md:pl-12">
+                    <h3 class="text-xl font-semibold mb-6">Personal Information</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-alt text-blue-600 dark:text-blue-400 mr-3 text-xl"></i>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Date of Birth</p>
+                                <p>July 11, 2003</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-map-marker-alt text-blue-600 dark:text-blue-400 mr-3 text-xl"></i>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Location</p>
+                                <p>Udaipur, Rajasthan, India</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-envelope text-blue-600 dark:text-blue-400 mr-3 text-xl"></i>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                                <p>ayushman.sharma@spsu.ac.in</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-phone text-blue-600 dark:text-blue-400 mr-3 text-xl"></i>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Phone</p>
+                                <p>+91 82399 34935</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-8 flex space-x-4">
+                        <!-- 3D Download CV Button -->
+                        <div class="button">
+                            <a href="Ayushman Sharma.pdf" download
+                                class="bg-blue-600 text-white px-6 py-3 rounded-md font-medium transition-colors">
+                                <i class="fas fa-download mr-2"></i>Download CV
+                            </a>
+                        </div>
+
+                        <!-- 3D Contact Me Button -->
+                        <div class="button">
+                            <a href="#contact"
+                                class="bg-white text-blue-600 border-2 border-blue-600 dark:text-blue-400 dark:border-blue-400 px-6 py-3 rounded-md font-medium transition-colors">
+                                <i class="fas fa-paper-plane mr-2"></i>Contact Me
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Education Section -->
+    <section id="education" class="py-20 bg-gray-50 dark:bg-gray-800 section scroll-mt-10">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center">My <span
+                    class="text-blue-600 dark:text-blue-400">Education</span></h2>
+            <div class="max-w-3xl mx-auto">
+                <div class="relative">
+                    <!-- Timeline Line -->
+                    <div
+                        class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 h-full w-1 bg-blue-200 dark:bg-gray-700">
+                    </div>
+
+                    <!-- B.Tech -->
+                    <div class="timeline-item">
+                        <div class="relative flex flex-col md:flex-row items-center mb-16">
+                            <div
+                                class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 w-6 h-6 rounded-full bg-blue-600 dark:bg-blue-400 z-10 border-4 border-white dark:border-gray-800">
+                            </div>
+
+                            <div class="md:w-1/2 md:pr-12 md:text-right pl-10 md:pl-0 mb-4 md:mb-0">
+                                <h3 class="text-xl font-semibold text-blue-600 dark:text-blue-400">B.Tech in Computer
+                                    Science & Engineering</h3>
+                                <p class="text-lg font-medium">SPSU University, Udaipur</p>
+                                <p class="text-gray-600 dark:text-gray-400">2023 - 2026 (Expected)</p>
+                            </div>
+                            <div class="md:w-1/2 md:pl-12 pl-10">
+                                <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-md">
+                                    <p>Currently pursuing B.Tech in CSE. Focused on full-stack web development, cloud
+                                        fundamentals, and AI-based web applications. Active in projects, workshops, and
+                                        internship activities.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Higher Secondary -->
+                    <div class="timeline-item">
+                        <div class="relative flex flex-col md:flex-row items-center mb-16">
+                            <div
+                                class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 w-6 h-6 rounded-full bg-blue-600 dark:bg-blue-400 z-10 border-4 border-white dark:border-gray-800">
+                            </div>
+
+                            <div class="md:w-1/2 md:pr-12 md:text-right pl-10 md:pl-0 mb-4 md:mb-0 md:order-1">
+                                <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-md">
+                                    <p>Completed 12th Grade with a focus on Physics, Chemistry, and Mathematics. Built
+                                        strong problem-solving and logical thinking foundations that drive my interest
+                                        in computer science.</p>
+                                </div>
+                            </div>
+                            <div class="md:w-1/2 md:pl-12 pl-10 md:order-0">
+                                <h3 class="text-xl font-semibold text-blue-600 dark:text-blue-400">Senior Secondary
+                                    Education</h3>
+                                <p class="text-lg font-medium">Bright Sun Public Sr Sec School, Sawai Madhopur</p>
+                                <p class="text-gray-600 dark:text-gray-400">2022 - 2023</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 10th -->
+                    <div class="timeline-item">
+                        <div class="relative flex flex-col md:flex-row items-center">
+                            <div
+                                class="absolute left-0 md:left-1/2 transform md:-translate-x-1/2 w-6 h-6 rounded-full bg-blue-600 dark:bg-blue-400 z-10 border-4 border-white dark:border-gray-800">
+                            </div>
+
+                            <div class="md:w-1/2 md:pr-12 md:text-right pl-10 md:pl-0 mb-4 md:mb-0">
+                                <h3 class="text-xl font-semibold text-blue-600 dark:text-blue-400">Secondary Education
+                                    (10th Grade)</h3>
+                                <p class="text-lg font-medium">Alpha English Senior Secondary School, Sawai Madhopur</p>
+                                <p class="text-gray-600 dark:text-gray-400">2020 - 2021</p>
+                            </div>
+                            <div class="md:w-1/2 md:pl-12 pl-10">
+                                <div class="bg-white dark:bg-gray-900 p-5 rounded-lg shadow-md">
+                                    <p>Successfully completed 10th grade under the RBSE curriculum with a strong
+                                        academic record. Developed foundational knowledge in science and mathematics.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Experience Section -->
+    <section id="experience" class="py-20 bg-white dark:bg-gray-900 section scroll-mt-10">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center">Work <span
+                    class="text-blue-600 dark:text-blue-400">Experience</span></h2>
+            <div class="max-w-4xl mx-auto">
+
+                <!-- Experience Item 1: Web Development Intern -->
+                <div
+                    class="mb-12 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-transform hover:transform hover:scale-[1.02]">
+                    <div class="p-6">
+                        <div class="flex flex-col md:flex-row justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-blue-600 dark:text-blue-400">Web Development Intern
+                                </h3>
+                                <p class="text-lg font-medium">Unified Mentor (Remote)</p>
+                            </div>
+                            <div class="mt-2 md:mt-0">
+                                <span
+                                    class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm font-medium px-3 py-1 rounded-full">
+                                    May 2025 – Present
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">
+                            Working on real-world frontend projects using HTML, CSS, JavaScript, and Tailwind. Built an
+                            interactive resume as part of internship deliverables.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2">
+                            <li>Developed responsive web layouts using Tailwind CSS</li>
+                            <li>Built an interactive resume website with smooth scroll, theme toggle, and animations
+                            </li>
+                            <li>Integrated accessibility and responsiveness best practices</li>
+                            <li>Collaborated with mentors for code reviews and feedback</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Experience Item 2: Major Academic Project -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-transform hover:transform hover:scale-[1.02]">
+                    <div class="p-6">
+                        <div class="flex flex-col md:flex-row justify-between mb-4">
+                            <div>
+                                <h3 class="text-xl font-bold text-blue-600 dark:text-blue-400">Major Project Developer
+                                </h3>
+                                <p class="text-lg font-medium">SPSU University</p>
+                            </div>
+                            <div class="mt-2 md:mt-0">
+                                <span
+                                    class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm font-medium px-3 py-1 rounded-full">
+                                    2024 – 2025
+                                </span>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">
+                            Created a Resume Builder web app using HTML, CSS, JavaScript, and MongoDB. Added AI features
+                            for skill suggestions and resume score feedback.
+                        </p>
+                        <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2">
+                            <li>Built form-based UI to collect and preview user data</li>
+                            <li>Integrated resume parsing and suggestion logic</li>
+                            <li>Used MongoDB to store form submissions</li>
+                            <li>Implemented light/dark mode and responsive design</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 bg-gray-50 dark:bg-gray-800 section scroll-mt-10">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center">My <span
+                    class="text-blue-600 dark:text-blue-400">Skills</span></h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+                <!-- Technical Skills -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-code text-blue-600 dark:text-blue-400 mr-3"></i>
+                        Technical Skills
+                    </h3>
+
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">HTML/CSS</span>
+                                <span>95%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: 0%;" data-width="95%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">JavaScript</span>
+                                <span>90%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: 0%;" data-width="90%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">Tailwind CSS</span>
+                                <span>85%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: 0%;" data-width="85%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">MongoDB</span>
+                                <span>70%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: 0%;" data-width="70%"></div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">Git & GitHub</span>
+                                <span>80%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" style="width: 0%;" data-width="80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Skills -->
+                <div>
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-briefcase text-blue-600 dark:text-blue-400 mr-3"></i>
+                        Professional Skills
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="text-center">
+                            <div
+                                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
+                                <i class="fas fa-users text-2xl skill-icon text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h4 class="font-medium">Team Collaboration</h4>
+                        </div>
+
+                        <div class="text-center">
+                            <div
+                                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
+                                <i class="fas fa-lightbulb text-2xl skill-icon text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h4 class="font-medium">Creative Thinking</h4>
+                        </div>
+
+                        <div class="text-center">
+                            <div
+                                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
+                                <i class="fas fa-clock text-2xl skill-icon text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h4 class="font-medium">Time Management</h4>
+                        </div>
+
+                        <div class="text-center">
+                            <div
+                                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
+                                <i class="fas fa-search text-2xl skill-icon text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h4 class="font-medium">Problem Solving</h4>
+                        </div>
+
+                        <div class="text-center">
+                            <div
+                                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
+                                <i class="fas fa-comments text-2xl skill-icon text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h4 class="font-medium">Communication</h4>
+                        </div>
+
+                        <div class="text-center">
+                            <div
+                                class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
+                                <i class="fas fa-cogs text-2xl skill-icon text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <h4 class="font-medium">Adaptability</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools & Technologies -->
+            <div class="mt-16 max-w-4xl mx-auto">
+                <h3 class="text-xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-tools text-blue-600 dark:text-blue-400 mr-3"></i>
+                    Tools & Technologies
+                </h3>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6">
+                    <div
+                        class="text-center p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <i class="fab fa-html5 text-3xl mb-2 text-orange-500"></i>
+                        <p class="font-medium">HTML5</p>
+                    </div>
+                    <div
+                        class="text-center p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <i class="fab fa-css3-alt text-3xl mb-2 text-blue-500"></i>
+                        <p class="font-medium">CSS3</p>
+                    </div>
+                    <div
+                        class="text-center p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <i class="fab fa-js text-3xl mb-2 text-yellow-500"></i>
+                        <p class="font-medium">JavaScript</p>
+                    </div>
+                    <div
+                        class="text-center p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <img src="https://www.svgrepo.com/show/374118/tailwind.svg" class="w-8 h-8 mx-auto mb-2"
+                            alt="Tailwind">
+                        <p class="font-medium">Tailwind</p>
+                    </div>
+                    <div
+                        class="text-center p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <i class="fab fa-git-alt text-3xl mb-2 text-red-500"></i>
+                        <p class="font-medium">Git</p>
+                    </div>
+                    <div
+                        class="text-center p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <i class="fab fa-github text-3xl mb-2 text-gray-700 dark:text-white"></i>
+                        <p class="font-medium">GitHub</p>
+                    </div>
+                    <div
+                        class="text-center p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <i class="fas fa-database text-3xl mb-2 text-green-600"></i>
+                        <p class="font-medium">MongoDB</p>
+                    </div>
+                    <div
+                        class="text-center p-4 bg-white dark:bg-gray-900 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                        <i class="fab fa-figma text-3xl mb-2 text-purple-600"></i>
+                        <p class="font-medium">Figma</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-white dark:bg-gray-900 section scroll-mt-10">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center">My <span
+                    class="text-blue-600 dark:text-blue-400">Projects</span></h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project 1 -->
+                <div class="project-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md"
+                    data-project="2">
+                    <div class="h-48 bg-green-100 dark:bg-green-900 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-leaf text-6xl text-green-300 dark:text-green-700"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Soil Farming Agent</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">
+                            A Firebase-based agriculture platform where users explore soil types, and admins manage crop
+                            and distributor data.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span
+                                class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded">HTML</span>
+                            <span
+                                class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded">Tailwind</span>
+                            <span
+                                class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded">JavaScript</span>
+                            <span
+                                class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs px-2 py-1 rounded">Firebase</span>
+                        </div>
+                        <a href="https://soil-876a9.web.app" target="_blank">
+                            <button
+                                class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors">
+                                View Live
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+
+                <!-- Project 2 -->
+                <div class="project-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md"
+                    data-project="3">
+                    <div class="h-48 bg-purple-100 dark:bg-purple-900 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-compass text-6xl text-purple-300 dark:text-purple-700"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Career Compass</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">
+                            A full-stack guidance platform to help students discover careers, take aptitude quizzes, and
+                            get college suggestions.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span
+                                class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-2 py-1 rounded">HTML</span>
+                            <span
+                                class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-2 py-1 rounded">CSS</span>
+                            <span
+                                class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-2 py-1 rounded">JavaScript</span>
+                            <span
+                                class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-2 py-1 rounded">MongoDB</span>
+                            <span
+                                class="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs px-2 py-1 rounded">Node.js</span>
+                        </div>
+                        <a href="https://career-guidance-system.netlify.app" target="_blank">
+                            <button
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-md transition-colors">
+                                View Live
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+
+                <!-- Project 3 -->
+                <div class="project-card bg-white dark:bg-gray-800 rounded-lg overflow-hidden shadow-md"
+                    data-project="4">
+                    <div class="h-48 bg-yellow-100 dark:bg-yellow-900 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-train text-6xl text-yellow-300 dark:text-yellow-700"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2">Train Ticket Reservation System</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">
+                            A full-stack platform for reserving train tickets with seat selection, route viewing, and
+                            booking confirmation logic.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span
+                                class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs px-2 py-1 rounded">HTML</span>
+                            <span
+                                class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs px-2 py-1 rounded">CSS</span>
+                            <span
+                                class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs px-2 py-1 rounded">JavaScript</span>
+                            <span
+                                class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs px-2 py-1 rounded">Node.js</span>
+                            <span
+                                class="bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 text-xs px-2 py-1 rounded">MongoDB</span>
+                        </div>
+                        <a href="https://github.com/ayushmanji/IndiTrack-Train-Ticket-Reservation-System"
+                            target="_blank">
+                            <button
+                                class="w-full bg-yellow-600 hover:bg-yellow-700 text-white py-2 rounded-md transition-colors">
+                                View on GitHub
+                            </button>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-gray-50 dark:bg-gray-800 section scroll-mt-10">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-12 text-center">Get In <span
+                    class="text-blue-600 dark:text-blue-400">Touch</span></h2>
+
+            <div class="flex flex-col md:flex-row max-w-5xl mx-auto">
+                <!-- Contact Info -->
+                <div class="md:w-1/2 mb-10 md:mb-0 md:pr-8">
+                    <h3 class="text-xl font-semibold mb-6">Contact Information</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-8">Feel free to reach out to me for any questions or
+                        opportunities. I'm always open to discussing new projects, creative ideas, or opportunities to
+                        be part of your vision.</p>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
+                                <i class="fas fa-map-marker-alt text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-medium">Location</h4>
+                                <p class="text-gray-600 dark:text-gray-400">Udaipur, Rajasthan, India</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
+                                <i class="fas fa-envelope text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-medium">Email</h4>
+                                <p class="text-gray-600 dark:text-gray-400">ayushman.sharma@example.com</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 bg-blue-100 dark:bg-blue-900 p-3 rounded-full">
+                                <i class="fas fa-phone text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-medium">Phone</h4>
+                                <p class="text-gray-600 dark:text-gray-400">+91 82399 34935</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10">
+                        <h3 class="text-xl font-semibold mb-6">Follow Me</h3>
+                        <div class="flex space-x-4">
+                            <a href="https://www.linkedin.com/in/ayushman-sharma-19b9392a8/" target="_blank"
+                                class="bg-blue-100 dark:bg-blue-900 p-3 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
+                                <i class="fab fa-linkedin-in text-blue-600 dark:text-blue-400"></i>
+                            </a>
+                            <a href="https://github.com/ayushmanji" target="_blank"
+                                class="bg-blue-100 dark:bg-blue-900 p-3 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors">
+                                <i class="fab fa-github text-blue-600 dark:text-blue-400"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="md:w-1/2">
+                    <div class="bg-white dark:bg-gray-900 rounded-lg shadow-md p-8">
+                        <h3 class="text-xl font-semibold mb-6">Send Me a Message</h3>
+                        <form id="contact-form" class="space-y-6">
+                            <div>
+                                <label for="name" class="block mb-2 font-medium">Name</label>
+                                <input type="text" id="name" name="name" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white">
+                            </div>
+
+                            <div>
+                                <label for="email" class="block mb-2 font-medium">Email</label>
+                                <input type="email" id="email" name="email" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white">
+                            </div>
+
+                            <div>
+                                <label for="subject" class="block mb-2 font-medium">Subject</label>
+                                <input type="text" id="subject" name="subject" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white">
+                            </div>
+
+                            <div>
+                                <label for="message" class="block mb-2 font-medium">Message</label>
+                                <textarea id="message" name="message" rows="5" required
+                                    class="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"></textarea>
+                            </div>
+
+                            <button type="submit"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-md font-medium transition-colors">
+                                <i class="fas fa-paper-plane mr-2"></i>Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 dark:bg-gray-950 text-white py-10">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold mb-4">Ayushman Sharma</h2>
+            <p class="mb-6">B.Tech CSE Student at SPSU University</p>
+
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="https://www.linkedin.com/in/ayushman-sharma-19b9392a8/" target="_blank"
+                    class="hover:text-blue-400 transition-colors">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+                <a href="https://github.com/ayushmanji" target="_blank"
+                    class="hover:text-blue-400 transition-colors">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+
+            <div class="border-t border-gray-800 pt-6">
+                <p>&copy; 2025 Ayushman Sharma. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Project Modal -->
+    <div id="project-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black bg-opacity-50" id="modal-overlay"></div>
+        <div
+            class="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-4xl w-full mx-4 z-10 overflow-hidden modal opacity-0">
+            <div class="relative">
+                <button id="close-modal"
+                    class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+                <div class="h-64 bg-blue-100 dark:bg-blue-900 flex items-center justify-center" id="modal-image">
+                    <i class="fas fa-shopping-cart text-6xl text-blue-300 dark:text-blue-700" id="modal-icon"></i>
+                </div>
+            </div>
+            <div class="p-8">
+                <h3 class="text-2xl font-bold mb-4" id="modal-title">Project Title</h3>
+                <div class="flex flex-wrap gap-2 mb-6" id="modal-tags">
+                    <!-- Tags will be inserted here -->
+                </div>
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold mb-2">Project Description</h4>
+                    <p class="text-gray-600 dark:text-gray-400" id="modal-description">Project description will be here.
+                    </p>
+                </div>
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold mb-2">Key Features</h4>
+                    <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1" id="modal-features">
+                        <!-- Features will be inserted here -->
+                    </ul>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition-colors"
+                        id="modal-live-link">
+                        <i class="fas fa-external-link-alt mr-2"></i>Live Demo
+                    </a>
+                    <a href="#"
+                        class="border border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 px-6 py-3 rounded-md font-medium transition-colors"
+                        id="modal-github-link">
+                        <i class="fab fa-github mr-2"></i>View Code
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top"
+        class="fixed bottom-6 right-6 bg-blue-600 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg opacity-0 invisible transition-all duration-300 hover:bg-blue-700 focus:outline-none">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+            (function () {
+                emailjs.init("_2jZQ7JWRbhVjoXxe");
+            })();
+
+        document.getElementById('contact-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            emailjs.sendForm('service_mnod0fo', 'template_tzf6xel', this)
+                .then(function () {
+                    alert("✅ Message sent successfully!");
+                    document.getElementById('contact-form').reset();
+                }, function (error) {
+                    alert("❌ Failed to send message.");
+                    console.error(error);
+                });
+        });
+    </script>
+
+
+    <script>
+        const projectsData = [
+            {
+                id: 2,
+                title: "Soil Farming Agent",
+                description:
+                    "A Firebase-powered platform that helps users explore suitable soil types for different crops, and enables admins to manage soil and distributor information dynamically.",
+                icon: "fa-leaf",
+                bgColor: "bg-green-100 dark:bg-green-900",
+                iconColor: "text-green-300 dark:text-green-700",
+                tags: ["HTML", "Tailwind", "JavaScript", "Firebase"],
+                features: [
+                    "User and admin authentication using Firebase Auth",
+                    "Admin can post soil and distributor data",
+                    "Users can view soil types and related distributors",
+                    "Firestore for real-time data management",
+                    "Deployed using Firebase Hosting"
+                ],
+                liveLink: "https://soil-876a9.web.app",
+                githubLink: "https://github.com/ayushmanji/soil-farming-agent"
+            },
+            {
+                id: 3,
+                title: "Career Compass",
+                description:
+                    "A career guidance system that helps students explore career paths, take aptitude quizzes, view matched roles, and get personalized recommendations and college suggestions.",
+                icon: "fa-compass",
+                bgColor: "bg-purple-100 dark:bg-purple-900",
+                iconColor: "text-purple-300 dark:text-purple-700",
+                tags: ["HTML", "CSS", "JavaScript", "Node.js", "MongoDB"],
+                features: [
+                    "Student registration and login system",
+                    "Career path exploration and filtering",
+                    "Aptitude quizzes with scoring and recommendations",
+                    "College finder based on user preferences",
+                    "Admin panel for managing quiz/career data"
+                ],
+                liveLink: "https://career-guidance-system.netlify.app",
+                githubLink: "https://github.com/ayushmanji/career-guidance-system"
+            },
+            {
+                id: 4,
+                title: "Train Ticket Reservation System",
+                description:
+                    "A full-stack web application to search train schedules, reserve seats, and generate digital ticket confirmations. Built for a seamless booking experience.",
+                icon: "fa-train",
+                bgColor: "bg-yellow-100 dark:bg-yellow-900",
+                iconColor: "text-yellow-300 dark:text-yellow-700",
+                tags: ["HTML", "CSS", "JavaScript", "Node.js", "MongoDB"],
+                features: [
+                    "Search train schedules and view routes",
+                    "User registration and booking system",
+                    "Seat availability check and reservation",
+                    "Real-time database with booking history",
+                    "Secure data storage with MongoDB and Node.js backend"
+                ],
+                liveLink: null, // no live deployment yet
+                githubLink: "https://github.com/ayushmanji/IndiTrack-Train-Ticket-Reservation-System"
+            }
+        ];
+
+
+        // DOM Elements
+        const themeToggle = document.getElementById('theme-toggle');
+        const menuToggle = document.getElementById('menu-toggle');
+        const closeMenu = document.getElementById('close-menu');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const projectCards = document.querySelectorAll('.project-card');
+        const projectModal = document.getElementById('project-modal');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const closeModal = document.getElementById('close-modal');
+        const backToTop = document.getElementById('back-to-top');
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contactForm = document.getElementById('contact-form');
+        const progressBars = document.querySelectorAll('.progress-bar-fill');
+
+        // Theme Toggle - Fixed implementation
+        function setTheme(isDark) {
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            // Save preference to localStorage
+            localStorage.setItem('dark-mode', isDark ? 'true' : 'false');
+        }
+
+        // Check for saved theme preference or use system preference
+        const savedTheme = localStorage.getItem('dark-mode');
+        if (savedTheme !== null) {
+            setTheme(savedTheme === 'true');
+        } else {
+            // If no saved preference, use system preference
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            setTheme(prefersDark);
+        }
+
+        // Theme toggle button
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(!isDark);
+        });
+
+        // Mobile Menu
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.add('open');
+        });
+
+        closeMenu.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+        });
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('#mobile-menu .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+        });
+
+        // Project Modal
+        projectCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const projectId = parseInt(card.getAttribute('data-project'));
+                const project = projectsData.find(p => p.id === projectId);
+
+                if (project) {
+                    // Set modal content
+                    document.getElementById('modal-title').textContent = project.title;
+                    document.getElementById('modal-description').textContent = project.description;
+                    document.getElementById('modal-image').className = `h-64 ${project.bgColor} flex items-center justify-center`;
+                    document.getElementById('modal-icon').className = `fas ${project.icon} text-6xl ${project.iconColor}`;
+                    document.getElementById('modal-live-link').href = project.liveLink;
+                    document.getElementById('modal-github-link').href = project.githubLink;
+
+                    // Set tags
+                    const tagsContainer = document.getElementById('modal-tags');
+                    tagsContainer.innerHTML = '';
+                    project.tags.forEach(tag => {
+                        const tagElement = document.createElement('span');
+                        tagElement.className = 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded';
+                        tagElement.textContent = tag;
+                        tagsContainer.appendChild(tagElement);
+                    });
+
+                    // Set features
+                    const featuresContainer = document.getElementById('modal-features');
+                    featuresContainer.innerHTML = '';
+                    project.features.forEach(feature => {
+                        const featureElement = document.createElement('li');
+                        featureElement.textContent = feature;
+                        featuresContainer.appendChild(featureElement);
+                    });
+
+                    // Show modal
+                    projectModal.classList.remove('hidden');
+                    setTimeout(() => {
+                        document.querySelector('#project-modal .modal').classList.add('opacity-100');
+                    }, 10);
+                }
+            });
+        });
+
+        // Close modal
+        function closeProjectModal() {
+            document.querySelector('#project-modal .modal').classList.remove('opacity-100');
+            setTimeout(() => {
+                projectModal.classList.add('hidden');
+            }, 300);
+        }
+
+        closeModal.addEventListener('click', closeProjectModal);
+        modalOverlay.addEventListener('click', closeProjectModal);
+
+        // Back to Top Button
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.remove('opacity-0', 'invisible');
+                backToTop.classList.add('opacity-100', 'visible');
+            } else {
+                backToTop.classList.remove('opacity-100', 'visible');
+                backToTop.classList.add('opacity-0', 'invisible');
+            }
+
+            // Check which section is in view for navigation highlighting
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionTop + sectionHeight) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Animate sections when they come into view
+            sections.forEach(section => {
+                const sectionTop = section.getBoundingClientRect().top;
+                if (sectionTop < window.innerHeight - 100) {
+                    section.classList.add('visible');
+
+                    // Animate progress bars if in skills section
+                    if (section.id === 'skills') {
+                        progressBars.forEach(bar => {
+                            const width = bar.getAttribute('data-width');
+                            bar.style.width = width;
+                        });
+                    }
+                }
+            });
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Contact Form
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Get form values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            // In a real application, you would send this data to a server
+            console.log('Form submitted:', { name, email, subject, message });
+
+            // Show success message (in a real app, you'd wait for server response)
+            const formContainer = contactForm.parentElement;
+            const successMessage = document.createElement('div');
+            successMessage.className = 'text-center py-8';
+            successMessage.innerHTML = `
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 mb-4">
+                    <i class="fas fa-check text-2xl text-green-600 dark:text-green-400"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Message Sent Successfully!</h3>
+                <p class="text-gray-600 dark:text-gray-400">Thank you for reaching out, ${name}. I'll get back to you soon.</p>
+                <button id="send-another" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors">
+                    Send Another Message
+                </button>
+            `;
+
+            formContainer.innerHTML = '';
+            formContainer.appendChild(successMessage);
+
+            // Reset form when "Send Another" is clicked
+            document.getElementById('send-another').addEventListener('click', () => {
+                formContainer.innerHTML = '';
+                formContainer.appendChild(contactForm);
+                contactForm.reset();
+            });
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            // Animate hero section
+            document.querySelector('#hero').classList.add('animate-fadeIn');
+
+            // Check which sections are visible on load
+            setTimeout(() => {
+                window.dispatchEvent(new Event('scroll'));
+            }, 100);
+        });
+    </script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'941ae5c667ae338a',t:'MTc0NzU2NjUxNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>
