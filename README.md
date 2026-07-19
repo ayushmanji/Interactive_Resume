@@ -18,7 +18,7 @@
 
 ## 🌍 Live Demo
 
-🔗 [View Resume Live](https://sparkly-conkies-114290.netlify.app)  
+🔗 [View Resume Live](ayushmans.netlify.app)  
 
 ---
 
