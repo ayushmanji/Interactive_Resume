@@ -1371,7 +1371,7 @@
             modal.classList.add('opacity-0', 'pointer-events-none');
         }
 
-        // Contact Form Submission (EmailJS)
+        // Contact Form Submission (EmailJS with mailto Fallback)
         const contactForm = document.getElementById('contact-form');
         const submitBtn = document.getElementById('submit-btn');
 
@@ -1380,6 +1380,11 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin mr-2"></i>Sending...`;
 
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
             emailjs.sendForm('service_mnod0fo', 'template_tzf6xel', this)
                 .then(function () {
                     alert("✅ Message sent successfully! Thank you for reaching out.");
@@ -1387,8 +1392,13 @@
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
                 }, function (error) {
-                    alert("❌ Failed to send message. Please try again or email directly.");
-                    console.error(error);
+                    console.error("EmailJS Error:", error);
+                    alert("⚠️ EmailJS service is currently reconnecting. Opening your mail client as a backup...");
+                    
+                    // Fallback to mailto link
+                    const mailtoUrl = `mailto:sharmaayushmansharma@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+                    window.location.href = mailtoUrl;
+
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
                 });
