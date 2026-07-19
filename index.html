@@ -1026,7 +1026,8 @@
                 <!-- Contact Form -->
                 <div class="lg:col-span-7 glass-card p-8 rounded-3xl shadow-xl">
                     <h3 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">Send Me a Message</h3>
-                    <form id="contact-form" class="space-y-5">
+                    <form id="contact-form" name="contact" method="POST" data-netlify="true" class="space-y-5">
+                        <input type="hidden" name="form-name" value="contact" />
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                             <div>
                                 <label for="name" class="block text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-2">Your Name</label>
@@ -1395,7 +1396,7 @@
                 message: message
             };
 
-            emailjs.send('service_fyxp1fg', 'template_tzf6xel', templateParams)
+            emailjs.send('service_fyxp1fg', 'template_tzf6xel', templateParams, '_2jZQ7JWRbhVjoXxe')
                 .then(function () {
                     alert("✅ Message sent successfully! Thank you for reaching out.");
                     contactForm.reset();
@@ -1403,14 +1404,26 @@
                     submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
                 }, function (error) {
                     console.error("EmailJS Error:", error);
-                    alert("⚠️ EmailJS service is currently reconnecting. Opening your mail client as a backup...");
                     
-                    // Fallback to mailto link
-                    const mailtoUrl = `mailto:sharmaayushmansharma@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
-                    window.location.href = mailtoUrl;
+                    // Try Netlify Form Submit via fetch
+                    const formData = new FormData(contactForm);
+                    fetch("/", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams(formData).toString()
+                    }).then(() => {
+                        alert("✅ Message sent successfully! Thank you for reaching out.");
+                        contactForm.reset();
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
+                    }).catch(() => {
+                        alert("⚠️ Opening your email client to send the message...");
+                        const mailtoUrl = `mailto:sharmaayushmansharma@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+                        window.location.href = mailtoUrl;
 
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
+                    });
                 });
         });
 
