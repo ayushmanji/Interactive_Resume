@@ -1386,37 +1386,31 @@
             const subject = document.getElementById('subject').value;
             const message = document.getElementById('message').value;
 
-            const templateParams = {
-                name: name,
-                from_name: name,
-                email: email,
-                from_email: email,
-                reply_to: email,
-                subject: subject,
-                message: message
-            };
-
-            emailjs.send('service_fyxp1fg', 'template_tzf6xel', templateParams, '_2jZQ7JWRbhVjoXxe')
-                .then(function () {
+            // Primary: Netlify Forms native POST
+            const formData = new FormData(contactForm);
+            fetch("/", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams(formData).toString()
+            }).then((res) => {
+                if (res.ok || res.status === 200 || res.status === 302) {
                     alert("✅ Message sent successfully! Thank you for reaching out.");
                     contactForm.reset();
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
-                }, function (error) {
-                    console.error("EmailJS Error:", error);
-                    
-                    // Try Netlify Form Submit via fetch
-                    const formData = new FormData(contactForm);
-                    fetch("/", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: new URLSearchParams(formData).toString()
-                    }).then(() => {
+                } else {
+                    throw new Error("Netlify form submission status non-200");
+                }
+            }).catch(() => {
+                // Secondary: EmailJS
+                const templateParams = { name: name, from_name: name, email: email, from_email: email, reply_to: email, subject: subject, message: message };
+                emailjs.send('service_fyxp1fg', 'template_tzf6xel', templateParams, '_2jZQ7JWRbhVjoXxe')
+                    .then(function () {
                         alert("✅ Message sent successfully! Thank you for reaching out.");
                         contactForm.reset();
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
-                    }).catch(() => {
+                    }, function () {
                         alert("⚠️ Opening your email client to send the message...");
                         const mailtoUrl = `mailto:sharmaayushmansharma@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
                         window.location.href = mailtoUrl;
@@ -1424,7 +1418,7 @@
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
                     });
-                });
+            });
         });
 
         // Scroll & Reveal Animations
