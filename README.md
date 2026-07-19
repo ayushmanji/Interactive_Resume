@@ -18,7 +18,7 @@
 
 ## 🌍 Live Demo
 
-🔗 [View Resume Live]([ayushmans.netlify.app](https://ayushmans.netlify.app/))  
+🔗 [View Resume Live](https://ayushmans.netlify.app/)  
 
 ---
 
