@@ -1386,38 +1386,35 @@
             const subject = document.getElementById('subject').value;
             const message = document.getElementById('message').value;
 
-            // Primary: Netlify Forms native POST
-            const formData = new FormData(contactForm);
-            fetch("/", {
+            // Format Netlify Form payload
+            const params = new URLSearchParams();
+            params.append("form-name", "contact");
+            params.append("name", name);
+            params.append("email", email);
+            params.append("subject", subject);
+            params.append("message", message);
+
+            fetch("/index.html", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: new URLSearchParams(formData).toString()
+                body: params.toString()
             }).then((res) => {
-                if (res.ok || res.status === 200 || res.status === 302) {
+                if (res.ok || res.status === 200 || res.status === 302 || res.status === 204) {
                     alert("✅ Message sent successfully! Thank you for reaching out.");
                     contactForm.reset();
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
                 } else {
-                    throw new Error("Netlify form submission status non-200");
+                    throw new Error("Netlify form error");
                 }
             }).catch(() => {
-                // Secondary: EmailJS
-                const templateParams = { name: name, from_name: name, email: email, from_email: email, reply_to: email, subject: subject, message: message };
-                emailjs.send('service_fyxp1fg', 'template_tzf6xel', templateParams, '_2jZQ7JWRbhVjoXxe')
-                    .then(function () {
-                        alert("✅ Message sent successfully! Thank you for reaching out.");
-                        contactForm.reset();
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
-                    }, function () {
-                        alert("⚠️ Opening your email client to send the message...");
-                        const mailtoUrl = `mailto:sharmaayushmansharma@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
-                        window.location.href = mailtoUrl;
+                // Direct mailto fallback
+                alert("⚠️ Opening your email client to send the message...");
+                const mailtoUrl = `mailto:sharmaayushmansharma@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`)}`;
+                window.location.href = mailtoUrl;
 
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
-                    });
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<i class="fas fa-paper-plane mr-2"></i>Send Message`;
             });
         });
 
